@@ -26,3 +26,30 @@ export async function signUp(req, res) {
     res.sendStatus(500);
   }
 }
+
+export async function signIn(req, res) {
+  const { email, password } = req.body;
+  try {
+    const { rows: userExists } = await authRepository.searchUser(email);
+
+    if (
+      userExists.length === 0 ||
+      !bcrypt.compareSync(password, userExists[0].password)
+    ) {
+      return res.status(401).send("Incorrect email or passwords!");
+    }
+
+    const token = jwt.sign(
+      { name: userExists[0].name, image: userExists[0].image },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "24h",
+      }
+    );
+
+    res.status(200).send({ userId: userExists[0].id, token });
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+}
