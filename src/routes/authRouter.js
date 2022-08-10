@@ -2,7 +2,6 @@ import { Router } from "express";
 import { signIn, signUp } from "../controllers/authController.js";
 import { signInSchema, signUpSchema } from "../schemas/authSchema.js";
 import { validateSchema } from "../middlewares/validators/schemaValidator.js";
-import { validateToken } from "../middlewares/validators/tokenValidator.js";
 
 const authRouter = Router();
 
