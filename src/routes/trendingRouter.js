@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { trendingRanking } from "../controllers/trendingController";
+import { trendingRanking } from "../controllers/trendingController.js";
 
 const router = Router();
 

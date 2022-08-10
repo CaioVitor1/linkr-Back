@@ -9,10 +9,7 @@ export async function trendingRanking(req, res){
             return res.sendStatus(404);
         }
 
-        let trendingArr = [];
-        for(let i=0;i<trending.length;i++){
-            trendingArr.push({ hashtag: trending[i].hashtag });
-        }
+        res.status(200).send(trending.rows);
 
     }catch(error){
         console.log(error);
