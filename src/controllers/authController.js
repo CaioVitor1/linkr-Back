@@ -40,7 +40,11 @@ export async function signIn(req, res) {
     }
 
     const token = jwt.sign(
-      { name: userExists[0].name, image: userExists[0].image },
+      {
+        id: userExists[0].id,
+        name: userExists[0].name,
+        image: userExists[0].image,
+      },
       process.env.JWT_SECRET,
       {
         expiresIn: "24h",
