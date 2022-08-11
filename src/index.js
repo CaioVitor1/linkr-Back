@@ -4,7 +4,6 @@ import dotenv from "dotenv";
 import chalk from "chalk";
 import router from "./routes/router.js";
 
-import router from "./routes/router.js";
 
 dotenv.config();
 
