@@ -32,3 +32,13 @@ export async function createPost(req, res) {
    }
     
 }
+
+export async function getPosts(req, res) {
+try {
+    const {rows: posts} = await connection.query(`SELECT users.id, users.name, users.image, posts.description , posts.url
+    FROM users JOIN posts ON users.id = posts."userId"
+    LIMIT 20;`);  
+}catch(erro) {
+
+}
+}
