@@ -10,10 +10,9 @@ import { validateSchema } from '../middlewares/validators/schemaValidator.js';
 
 const router = Router();
 
-//Colocar o validateToken na rota getposts!!!
 
-router.post('/newpost', validateSchema(newPostSchema) , createPost);
-router.get('/getposts', getPosts)
+router.post('/newpost', validateToken, validateSchema(newPostSchema) , createPost);
+router.get('/getposts', validateToken, getPosts)
 export default router;
 
 

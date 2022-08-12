@@ -12,11 +12,12 @@ export async function validateToken(req, res, next) {
   }
   try {
     const verifiedUser = jwt.verify(token, process.env.JWT_SECRET);
-
+   
     res.locals.user = verifiedUser;
+    next();
   } catch (error) {
     return res.status(401).send("invalid token");
   }
 
-  next();
+  
 }
