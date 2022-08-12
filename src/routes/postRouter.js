@@ -1,15 +1,19 @@
-import { Router } from "express";
-import newPostSchema from "../schemas/newPostSchema.js";
-import { validateSchema } from "../middlewares/validators/schemaValidator.js";
-import { createPost, getPosts } from "../controllers/postController.js";
-import { validateToken } from "../middlewares/validators/tokenValidator.js";
+
+
+import { Router } from 'express';
+
+import newPostSchema from '../schemas/newPostSchema.js';
+
+import { createPost, getPosts } from '../controllers/postController.js';
+import { validateToken } from '../middlewares/validators/tokenValidator.js';
+import { validateSchema } from '../middlewares/validators/schemaValidator.js';
+
 const router = Router();
 
-router.post(
-  "/newpost",
-  validateToken,
-  validateSchema(newPostSchema),
-  createPost
-);
-router.post("/getposts", validateToken, getPosts);
+//Colocar o validateToken na rota getposts!!!
+
+router.post('/newpost', validateSchema(newPostSchema) , createPost);
+router.get('/getposts', getPosts)
 export default router;
+
+
