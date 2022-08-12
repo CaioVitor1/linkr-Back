@@ -19,6 +19,23 @@ export async function userPagePosts(req, res){
         console.log(error);
         res.status(500).send(error);
     }
+}
 
+export async function searchUserByName(req, res){
+    try{
+        const search = req.query.search;
+
+        const listUsers = await userPageRepository.getUsersByName(search);
+
+        if(listUsers.rowCount === 0){
+            return res.status(200).send([]);
+        }
+
+        console.log(listUsers.rows);
+        res.status(200).send(listUsers.rows);
+    }catch(error){
+        console.log(error);
+        res.status(500).send(error);
+    }
 }
 

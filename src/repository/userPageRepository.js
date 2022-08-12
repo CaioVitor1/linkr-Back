@@ -6,8 +6,12 @@ async function getUserPagePosts(userId){
     
 }
 
+async function getUsersByName(search){
+    return connection.query(`select users.id, users."name", users.image from users where "name" like $1`, [search + '%']);
+}
 
 export const userPageRepository = {
-    getUserPagePosts
+    getUserPagePosts,
+    getUsersByName
   };
   

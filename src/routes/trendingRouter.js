@@ -4,7 +4,7 @@ import { validateToken } from "../middlewares/validators/tokenValidator.js";
 
 const router = Router();
 
-router.get('/trendingRanking', validateToken, trendingRanking);
-router.post('/hashtagPosts/:hashtag', validateToken, hashtagPosts);
+router.get('/trendingRanking', trendingRanking);
+router.get('/hashtag/:hashtag', hashtagPosts);
 
 export default router;
