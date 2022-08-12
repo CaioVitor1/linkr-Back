@@ -1,4 +1,5 @@
 
+
 import { Router } from 'express';
 
 import newPostSchema from '../schemas/newPostSchema.js';
@@ -14,4 +15,5 @@ const router = Router();
 router.post('/newpost', validateSchema(newPostSchema) , createPost);
 router.get('/getposts', getPosts)
 export default router;
+
 
