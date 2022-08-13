@@ -5,12 +5,13 @@ import { postRepository } from "../repository/postsRepositoy.js";
 
 export async function createPost(req, res) {
    try{
-    console.log("chegou aqui")
+
+
     const verifiedUser = res.locals.user
     console.log(verifiedUser)
 
     const id = verifiedUser.id
-    console.log(id);
+    console.log("userId: " + id);
    
     let {url, comment} = req.body
     console.log(id, url, comment)
@@ -45,8 +46,28 @@ export async function createPost(req, res) {
 
 export async function getPosts(req, res) {
 try {
-    const {rows: posts} = await postRepository.listPosts()
-    res.send(posts)
+
+    
+    const {rows: posts} = await connection.query(`select users.id, posts.id AS "postId", posts."userId", users.name, users.image AS profile, posts.comment , posts.url, posts.title, posts.image, posts.description, count(likes."postId") as "likesCount" from posts inner join users on posts."userId" = users.id left join likes on posts.id = likes."postId" group by posts.id, users.id order by posts.id desc limit 20`);  
+    const postsId = posts.map(post => post.postId);
+
+    const {rows: postsLikes} = await connection.query(`select likes.*, users.name from likes inner join users ON likes."userId" = users.id where "postId" = ANY($1::int[])`, [postsId]);
+
+    let joinPostsLikes = [...posts];
+
+    for(let i=0;i<joinPostsLikes.length;i++){
+        joinPostsLikes[i].likes = [];
+        postsLikes.map(like => {
+            if(like.postId === joinPostsLikes[i].postId){
+                joinPostsLikes[i].likes.push({ id: like.id, userId: like.userId, postId: like.postId, name: like.name });
+            }
+        });
+    }
+
+    res.send(joinPostsLikes);
+
+    //const {rows: posts} = await postRepository.listPosts()
+
 }catch(erro) {
     console.log(erro)
     return res.status(500).send("erro")
