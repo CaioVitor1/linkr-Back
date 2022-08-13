@@ -27,12 +27,17 @@ async function deletingPost(postId) {
     return connection.query('DELETE FROM posts WHERE id = $1', [postId]);
 }
 
+async function deletingHashtags(postId){
+    return connection.query('DELETE FROM hashtags WHERE "postId" = $1', [postId]);
+}
+
 export const postRepository = {
     insertNewPost,
     searchPost,
     insertHashtag,
     listPosts,
     searchPostId,
-    deletingPost
+    deletingPost,
+    deletingHashtags
   };
   
