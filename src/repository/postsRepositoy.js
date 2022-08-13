@@ -19,10 +19,25 @@ async function listPosts() {
     LIMIT 20;`);  
 }
 
+async function searchPostId(postId) {
+    return connection.query('SELECT * FROM posts WHERE id = $1', [postId]);
+}
+
+async function deletingPost(postId) {
+    return connection.query('DELETE FROM posts WHERE id = $1', [postId]);
+}
+
+async function deletingHashtags(postId){
+    return connection.query('DELETE FROM hashtags WHERE "postId" = $1', [postId]);
+}
+
 export const postRepository = {
     insertNewPost,
     searchPost,
     insertHashtag,
-    listPosts
+    listPosts,
+    searchPostId,
+    deletingPost,
+    deletingHashtags
   };
   
