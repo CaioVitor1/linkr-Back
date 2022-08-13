@@ -31,6 +31,10 @@ async function deletingHashtags(postId){
     return connection.query('DELETE FROM hashtags WHERE "postId" = $1', [postId]);
 }
 
+async function updatingPost(updateComment,postId){
+    return connection.query(`UPDATE posts SET "comment" = '${updateComment}' WHERE id = $1`, [postId])
+}
+
 export const postRepository = {
     insertNewPost,
     searchPost,
@@ -38,6 +42,7 @@ export const postRepository = {
     listPosts,
     searchPostId,
     deletingPost,
-    deletingHashtags
+    deletingHashtags,
+    updatingPost
   };
   
