@@ -52,3 +52,34 @@ try {
     return res.status(500).send("erro")
 }
 }
+
+export async function deletepost(req, res) {
+    try{
+        const {postId} = req.params;
+        const verifiedUser = res.locals.user
+        console.log(verifiedUser)
+
+        const id = verifiedUser.id
+
+        const {rows: searchIdPost} = await postRepository.searchPostId(postId)  
+            
+        if(searchIdPost.length === 0) {
+            return res.sendStatus(404)
+        }
+
+        if(searchIdPost[0].userId !== id) {
+           return res.status(401).send("O post não pertence a esse usuário")
+        }
+        if(searchIdPost[0].userId === id) {
+            const deletingHashtags = await postRepository.deletingHashtags(postId)
+
+            const deletingUrl = await postRepository.deletingPost(postId)
+            return res.status(204).send("Post deletado")
+        }
+        
+
+    }catch(erro) {
+        console.log(erro)
+        return res.status(500).send("erro")
+    }
+}
