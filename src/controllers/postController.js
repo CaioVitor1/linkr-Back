@@ -4,8 +4,9 @@ import urlMetadata from 'url-metadata';
 
 export async function createPost(req, res) {
    try{
-    //const userId = res.locals.session
-    const userId = 1;
+    const userId = res.locals.user.id;
+    console.log("userId: " + userId);
+    //const userId = 1;
     let {url, comment} = req.body
     console.log(userId, url, comment)
     if(comment === undefined) {
@@ -41,11 +42,29 @@ export async function createPost(req, res) {
 export async function getPosts(req, res) {
 try {
     
-    const {rows: posts} = await connection.query(`SELECT users.id, posts.id AS postId, users.name, users.image AS profile, posts.comment , posts.url, posts.title, posts.image, posts.description
-    FROM users JOIN posts ON users.id = posts."userId"
-    ORDER BY postId DESC
-    LIMIT 20;`);  
-    res.send(posts)
+    const {rows: posts} = await connection.query(`select users.id, posts.id AS "postId", posts."userId", users.name, users.image AS profile, posts.comment , posts.url, posts.title, posts.image, posts.description, count(likes."postId") as "likesCount" from posts inner join users on posts."userId" = users.id left join likes on posts.id = likes."postId" group by posts.id, users.id order by posts.id desc limit 20`);  
+
+
+    const postsId = posts.map(post => post.postId);
+
+    // // console.log(posts);
+    // console.log(postsId);
+
+    const {rows: postsLikes} = await connection.query(`select likes.*, users.name from likes inner join users ON likes."userId" = users.id where "postId" = ANY($1::int[])`, [postsId]);
+
+    let joinPostsLikes = [...posts];
+
+    for(let i=0;i<joinPostsLikes.length;i++){
+        joinPostsLikes[i].likes = [];
+        postsLikes.map(like => {
+            if(like.postId === joinPostsLikes[i].postId){
+                joinPostsLikes[i].likes.push({ id: like.id, userId: like.userId, postId: like.postId, name: like.name });
+            }
+        });
+    }
+    // console.log(joinPostsLikes);
+    // console.log(postsLikes);
+    res.send(joinPostsLikes);
 }catch(erro) {
     console.log(erro)
     return res.status(500).send("erro")
