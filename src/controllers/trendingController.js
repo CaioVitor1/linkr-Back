@@ -1,4 +1,5 @@
 import { trendingRepository } from '../repository/trendingRepository.js';
+import { likesRepository } from '../repository/likesRepository.js';
 
 export async function trendingRanking(req, res){
     try{
@@ -21,13 +22,29 @@ export async function hashtagPosts(req, res){
     try{
         const { hashtag } = req.params;
     
-        const postsJoin = await trendingRepository.getHashtagPosts(hashtag);
+        const {rows: posts} = await trendingRepository.getHashtagPosts(hashtag);
 
-        if(postsJoin.rowCount === 0) {
+        if(!posts) {
             return res.sendStatus(404);
         }
 
-        res.status(200).send(postsJoin.rows);
+        const postsId = posts.map(post => post.postId);
+    
+        const {rows: postsLikes} = await likesRepository.getPostsLikes(postsId);
+    
+        let joinPostsLikes = [...posts];
+    
+        for(let i=0;i<joinPostsLikes.length;i++){
+            joinPostsLikes[i].likes = [];
+            postsLikes.map(like => {
+                if(like.postId === joinPostsLikes[i].postId){
+                    joinPostsLikes[i].likes.push({ id: like.id, userId: like.userId, postId: like.postId, name: like.name });
+                }
+            });
+        }
+
+        res.status(200).send(joinPostsLikes);
+
     }catch(error){
         console.log(error);
         res.sendStatus(500);

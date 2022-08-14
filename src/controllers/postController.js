@@ -46,10 +46,7 @@ try {
 
 
     const postsId = posts.map(post => post.postId);
-
-    // // console.log(posts);
-    // console.log(postsId);
-
+    
     const {rows: postsLikes} = await connection.query(`select likes.*, users.name from likes inner join users ON likes."userId" = users.id where "postId" = ANY($1::int[])`, [postsId]);
 
     let joinPostsLikes = [...posts];
@@ -62,8 +59,7 @@ try {
             }
         });
     }
-    // console.log(joinPostsLikes);
-    // console.log(postsLikes);
+
     res.send(joinPostsLikes);
 }catch(erro) {
     console.log(erro)
