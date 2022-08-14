@@ -1,15 +1,16 @@
 import connection from "../databases/postgres.js";
 
 export async function createLike(req, res) {
-  const { postId } = req.body;
+  const { idUser, postid} = req.body;
   const { user } = res.locals;
   try {
+    console.log(idUser, postid)
     await connection.query(
       `INSERT INTO likes ("userId", "postId") VALUES ($1, $2)`,
-      [user.id, postId]
+      [idUser, postid]
     );
-
-    res.send("Like inserted");
+    
+    return res.send("Like inserted");
   } catch (error) {
     console.error(error);
     res.sendStatus(500);
@@ -17,18 +18,24 @@ export async function createLike(req, res) {
 }
 
 export async function deleteLike(req, res) {
-  const { postId } = req.body;
+  const { idUser, postid } = req.body;
   const { user } = res.locals;
+  console.log("chegou aqui")
   try {
+    const {rows: searchLike} = await connection.query(`select * from likes where "postId" = '${postid}' AND "userId" = '${idUser}'`)
+    
+    const id = searchLike[0].id
+    console.log(id)
+    
     await connection.query(
-      `DELETE FROM likes WHERE "postId"=$1 AND "userId"=$2`,
-      [postId, user.id]
-    );
+      `DELETE FROM likes WHERE id = ${id}
+      
+    `); 
 
-    res.send("Like deleted");
+    return res.send("Like deleted");
   } catch (error) {
     console.error(error);
-    res.sendStatus(500);
+   return  res.sendStatus(500);
   }
 }
 
