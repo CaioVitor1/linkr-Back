@@ -12,5 +12,6 @@ router.use(authRouter);
 router.use(trendingRouter);
 router.use(userPageRouter);
 router.use(postRouter);
+router.use(likesRouter)
 
 export default router;
