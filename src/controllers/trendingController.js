@@ -1,5 +1,7 @@
 import { trendingRepository } from '../repository/trendingRepository.js';
 import { likesRepository } from '../repository/likesRepository.js';
+import joi from 'joi';
+import connection from '../databases/postgres.js';
 
 export async function trendingRanking(req, res){
     try{
