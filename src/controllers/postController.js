@@ -17,7 +17,7 @@ export async function createPost(req, res) {
     
      const newPost = await connection.query('INSERT INTO posts ("userId", comment, url, title, description, image) VALUES ($1, $2, $3, $4, $5, $6 )', [userId, comment,url, metaDados.title, metaDados.description, metaDados.image]);
     
-    const {rows: searchPostId} = await connection.query(`SELECT * FROM posts WHERE url LIKE '%${url}'`);  
+    const {rows: searchPostId} = await connection.query(`SELECT * FROM posts WHERE url LIKE '%${url}'`);
     console.log(searchPostId)
     console.log(searchPostId[0].id)
     const hashtags = comment.split('#')
@@ -44,7 +44,6 @@ try {
     
     const {rows: posts} = await connection.query(`select users.id, posts.id AS "postId", posts."userId", users.name, users.image AS profile, posts.comment , posts.url, posts.title, posts.image, posts.description, count(likes."postId") as "likesCount" from posts inner join users on posts."userId" = users.id left join likes on posts.id = likes."postId" group by posts.id, users.id order by posts.id desc limit 20`);  
 
-
     const postsId = posts.map(post => post.postId);
     
     const {rows: postsLikes} = await connection.query(`select likes.*, users.name from likes inner join users ON likes."userId" = users.id where "postId" = ANY($1::int[])`, [postsId]);
@@ -60,6 +59,7 @@ try {
         });
     }
 
+    //console.log(joinPostsLikes);
     res.send(joinPostsLikes);
 }catch(erro) {
     console.log(erro)
