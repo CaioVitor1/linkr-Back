@@ -89,6 +89,9 @@ export async function deletepost(req, res) {
         if(searchIdPost[0].userId !== id) {
            return res.status(401).send("O post não pertence a esse usuário")
         }
+
+       const deletlikes = await postRepository.deletingLikes(postId)
+
         if(searchIdPost[0].userId === id) {
             const deletingHashtags = await postRepository.deletingHashtags(postId)
 

@@ -35,6 +35,9 @@ async function updatingPost(updateComment,postId){
     return connection.query(`UPDATE posts SET "comment" = '${updateComment}' WHERE id = $1`, [postId])
 }
 
+async function deletingLikes(postId) {
+    return connection.query('DELETE FROM likes WHERE "postId" = $1', [postId])
+}
 export const postRepository = {
     insertNewPost,
     searchPost,
@@ -43,6 +46,7 @@ export const postRepository = {
     searchPostId,
     deletingPost,
     deletingHashtags,
-    updatingPost
+    updatingPost,
+    deletingLikes
   };
   
