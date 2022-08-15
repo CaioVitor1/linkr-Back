@@ -45,6 +45,7 @@ try {
 
     
     const {rows: posts} = await connection.query(`select users.id, posts.id AS "postId", posts."userId", users.name, users.image AS profile, posts.comment , posts.url, posts.title, posts.image, posts.description, count(likes."postId") as "likesCount" from posts inner join users on posts."userId" = users.id left join likes on posts.id = likes."postId" group by posts.id, users.id order by posts.id desc limit 20`);  
+
     const postsId = posts.map(post => post.postId);
 
     const {rows: postsLikes} = await connection.query(`select likes.*, users.name from likes inner join users ON likes."userId" = users.id where "postId" = ANY($1::int[])`, [postsId]);
@@ -60,6 +61,7 @@ try {
         });
     }
 
+    //console.log(joinPostsLikes);
     res.send(joinPostsLikes);
 
     //const {rows: posts} = await postRepository.listPosts()
