@@ -4,6 +4,6 @@ import { validateToken } from "../middlewares/validators/tokenValidator.js";
 
 const router = Router();
 router.get('/user/:id', userPagePosts);
-router.get('/users/', searchUserByName);
+router.get('/users/', validateToken, searchUserByName);
 
 export default router;
