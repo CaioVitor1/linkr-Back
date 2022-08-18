@@ -59,7 +59,7 @@ export async function getPosts(req, res) {
       );
     }
 
-    const teste = posts.rows;
+    const postsRows = posts.rows;
 
     console.log(teste);
     const postsId = teste.map((post) => post.postId);
@@ -69,7 +69,7 @@ export async function getPosts(req, res) {
       [postsId]
     );
 
-    let joinPostsLikes = [...teste];
+    let joinPostsLikes = [...postsRows];
 
     for (let i = 0; i < joinPostsLikes.length; i++) {
       joinPostsLikes[i].likes = [];
