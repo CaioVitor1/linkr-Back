@@ -1,5 +1,6 @@
 import { userPageRepository } from '../repository/userPageRepository.js'
 import { likesRepository } from '../repository/likesRepository.js';
+import connection from '../databases/postgres.js';
 
 export async function userPagePosts(req, res){
     try{
@@ -37,14 +38,49 @@ export async function userPagePosts(req, res){
 export async function searchUserByName(req, res){
     try{
         const search = req.query.search;
+        const verifiedUser = res.locals.user
+        const userId = verifiedUser.id
+        
+        // preciso saber qual usuário está logado através do token
+        const {rows: listUsersMatch} = await userPageRepository.getUsersByName(search, userId);
 
-        const listUsers = await userPageRepository.getUsersByName(search);
+        const {rows: listEveryUser} = await connection.query(`select users.id, users."name", users.image from users where "name" like $1`, [search + '%'])
+        console.log(listUsersMatch)
+        console.log(listEveryUser)
 
-        if(listUsers.rowCount === 0){
+        if(listEveryUser.length === 0){
             return res.status(200).send([]);
         }
-        console.log(listUsers.rows);
-        res.status(200).send(listUsers.rows);
+         if(listUsersMatch.length === 0) {
+            return res.status(200).send(listEveryUser)
+         }
+        if(listUsersMatch.length === 1) {
+            console.log("tá aqui no 1")
+            for(let i = 0; i < listEveryUser.length; i++) {
+                if(listUsersMatch[0].id !== listEveryUser[i].id){
+                    listUsersMatch.push(listEveryUser[i])
+                }
+            }
+            return res.status(200).send(listUsersMatch); 
+        }
+
+        if(listUsersMatch.length >= 2) {
+            console.log("tá aqui no 2")
+            for(let i = 0; i < listEveryUser.length; i++) {
+                for(let j = 0; j < listUsersMatch.length; j++) {
+                    if(listEveryUser[i].id !== listUsersMatch[j].id) {
+                        listUsersMatch.push(listEveryUser[i])
+                        
+                    }
+                }
+                
+            } return res.status(200).send(listUsersMatch); 
+        }
+        return res.status(200).send(listUsersMatch);  
+        
+    
+     
+        
     }catch(error){
         console.log(error);
         res.status(500).send(error);

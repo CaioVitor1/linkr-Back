@@ -6,12 +6,18 @@ async function getUserPagePosts(userId){
     
 }
 
-async function getUsersByName(search){
-    return connection.query(`select users.id, users."name", users.image from users where "name" like $1`, [search + '%']);
+async function getUsersByName(search, userId){
+    return connection.query(`select users.id, users."name", users.image, followers.id AS followersId from users
+    JOIN followers
+    ON "name" like $1 AND users.id = followers."profileId" 
+    AND followers.follower = $2;`, [search + '%', userId]);
 }
 
 export const userPageRepository = {
     getUserPagePosts,
     getUsersByName
   };
+  
+ 
+
   
