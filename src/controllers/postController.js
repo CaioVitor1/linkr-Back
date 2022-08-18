@@ -62,12 +62,14 @@ try {
         order by posts.id
         desc limit 10;`, [id]);
 
+
     const postsId = posts.map((post) => post.postId);
 
     const { rows: postsLikes } = await connection.query(
       `select likes.*, users.name from likes inner join users ON likes."userId" = users.id where "postId" = ANY($1::int[])`,
       [postsId]
     );
+    
     let joinPostsLikes = [...posts];
 
     for (let i = 0; i < joinPostsLikes.length; i++) {
@@ -158,7 +160,6 @@ export async function updatePosts(req, res) {
 
   return res.status(200).send("Comentário atualizado");
 }
-
 
 export async function getposts2(req, res) {
   const { offset } = req.params;
