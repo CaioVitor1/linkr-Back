@@ -44,7 +44,7 @@ export async function getPosts(req, res) {
 try {
 
     
-    const {rows: posts} = await connection.query(`select users.id, posts.id AS "postId", posts."userId", users.name, users.image AS profile, posts.comment , posts.url, posts.title, posts.image, posts.description, count(likes."postId") as "likesCount" from posts inner join users on posts."userId" = users.id left join likes on posts.id = likes."postId" group by posts.id, users.id order by posts.id desc limit 20`);  
+    const {rows: posts} = await connection.query(`select users.id, posts.id AS "postId", posts."userId", users.name, users.image AS profile, posts.comment, posts.url, posts.title, posts.image, posts.description, count(likes."postId") as "likesCount", count(comments."postId") as "commentsCount" from posts inner join users on posts."userId" = users.id left join likes on posts.id = likes."postId" left join comments on posts.id = comments."postId" group by posts.id, users.id order by posts.id desc limit 20`);
 
     const postsId = posts.map(post => post.postId);
 
@@ -110,7 +110,7 @@ export async function updatePosts(req, res) {
     const {updateComment, url} = req.body
     const verifiedUser = res.locals.user
     if(updateComment === undefined) {
-        updateComment = ""
+        updateComment = "";
     }
     const userId = verifiedUser.id
     const {rows: searchPostId} = await postRepository.searchPost(url) 
