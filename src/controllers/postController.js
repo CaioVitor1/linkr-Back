@@ -44,19 +44,32 @@ export async function createPost(req, res) {
 }
 
 export async function getPosts(req, res) {
-  try {
-    const { rows: posts } = await connection.query(
-      `select users.id, posts.id AS "postId", posts."userId", users.name, users.image AS profile, posts.comment, posts.url, posts.title, posts.image, posts.description, count(likes."postId") as "likesCount", count(comments."postId") as "commentsCount" from posts inner join users on posts."userId" = users.id left join likes on posts.id = likes."postId" left join comments on posts.id = comments."postId" group by posts.id, users.id order by posts.id desc limit 10`
-    );
+  const index = parseInt(req.query.index);
 
-    const postsId = posts.map((post) => post.postId);
+  try {
+    let posts = [];
+    if (index > 10) {
+      posts = await connection.query(
+        `select users.id, posts.id AS "postId", posts."userId", users.name, users.image AS profile, posts.comment, posts.url, posts.title, posts.image, posts.description, count(likes."postId") as "likesCount", count(comments."postId") as "commentsCount" from posts inner join users on posts."userId" = users.id left join likes on posts.id = likes."postId" left join comments on posts.id = comments."postId" group by posts.id, users.id order by posts.id desc limit $1`,
+        [index + 4]
+      );
+    } else {
+      posts = await connection.query(
+        `select users.id, posts.id AS "postId", posts."userId", users.name, users.image AS profile, posts.comment, posts.url, posts.title, posts.image, posts.description, count(likes."postId") as "likesCount", count(comments."postId") as "commentsCount" from posts inner join users on posts."userId" = users.id left join likes on posts.id = likes."postId" left join comments on posts.id = comments."postId" group by posts.id, users.id order by posts.id desc limit 10`
+      );
+    }
+
+    const teste = posts.rows;
+
+    console.log(teste);
+    const postsId = teste.map((post) => post.postId);
 
     const { rows: postsLikes } = await connection.query(
       `select likes.*, users.name from likes inner join users ON likes."userId" = users.id where "postId" = ANY($1::int[])`,
       [postsId]
     );
 
-    let joinPostsLikes = [...posts];
+    let joinPostsLikes = [...teste];
 
     for (let i = 0; i < joinPostsLikes.length; i++) {
       joinPostsLikes[i].likes = [];

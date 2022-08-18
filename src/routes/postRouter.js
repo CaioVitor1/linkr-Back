@@ -21,7 +21,7 @@ router.post(
   validateSchema(newPostSchema),
   createPost
 );
-router.get("/getposts", validateToken, getPosts);
+router.get("/getposts?", validateToken, getPosts);
 router.delete("/deletepost/:postId", validateToken, deletepost);
 router.put("/updateposts", validateToken, updatePosts);
 router.get("/getallposts", getAllPosts);
