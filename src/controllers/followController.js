@@ -70,3 +70,18 @@ export async function deleteFollow(req, res) {
         return res.status(500).send("erro")
     }
 }
+
+export async function searchAnyFollow(req, res) {
+    try{
+        const verifiedUser = res.locals.user
+        const follower = verifiedUser.id;
+
+        const {rows: searchfollow} = await connection.query('SELECT * FROM followers WHERE follower = $1', [follower])
+        console.log(searchFollow.length)
+        console.log(searchfollow)
+        return res.status(200).send(searchfollow)
+    }catch(erro) {
+        console.log(erro)
+        return res.status(500).send("erro")
+    }
+}
