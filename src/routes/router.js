@@ -5,6 +5,7 @@ import trendingRouter from "./trendingRouter.js";
 import userPageRouter from "./userPageRouter.js";
 import likesRouter from "./likesRouter.js";
 import commentsRouter from "./commentsRouter.js";
+import followRouter from "./followRouter.js";
 
 const router = Router();
 
@@ -14,5 +15,6 @@ router.use(userPageRouter);
 router.use(postRouter);
 router.use(likesRouter);
 router.use(commentsRouter);
+router.use(followRouter);
 
 export default router;
