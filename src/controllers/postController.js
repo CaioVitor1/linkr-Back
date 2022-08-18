@@ -44,18 +44,20 @@ export async function createPost(req, res) {
 }
 
 export async function getPosts(req, res) {
-  try {
-    const { rows: posts } = await connection.query(
-      `select users.id, posts.id AS "postId", posts."userId", users.name, users.image AS profile, posts.comment , posts.url, posts.title, posts.image, posts.description, count(likes."postId") as "likesCount" from posts inner join users on posts."userId" = users.id left join likes on posts.id = likes."postId" group by posts.id, users.id order by posts.id desc limit 10`
-    );
+
+try {
+
+    
+    const {rows: posts} = await connection.query(`select users.id, posts.id AS "postId", posts."userId", users.name, users.image AS profile, posts.comment, posts.url, posts.title, posts.image, posts.description, count(likes."postId") as "likesCount", count(comments."postId") as "commentsCount" from posts inner join users on posts."userId" = users.id left join likes on posts.id = likes."postId" left join comments on posts.id = comments."postId" group by posts.id, users.id order by posts.id desc limit 10`);
+
 
     const postsId = posts.map((post) => post.postId);
 
     const { rows: postsLikes } = await connection.query(
       `select likes.*, users.name from likes inner join users ON likes."userId" = users.id where "postId" = ANY($1::int[])`,
       [postsId]
-    );
-
+    );~
+~
     let joinPostsLikes = [...posts];
 
     for (let i = 0; i < joinPostsLikes.length; i++) {
@@ -147,18 +149,6 @@ export async function updatePosts(req, res) {
   return res.status(200).send("Comentário atualizado");
 }
 
-export async function getAllPosts(req, res) {
-  try {
-    const { rows: posts } = await connection.query(
-      `select users.id, posts.id AS "postId", posts."userId", users.name, users.image AS profile, posts.comment , posts.url, posts.title, posts.image, posts.description, count(likes."postId") as "likesCount" from posts inner join users on posts."userId" = users.id left join likes on posts.id = likes."postId" group by posts.id, users.id order by posts.id desc `
-    );
-
-    res.send(posts);
-  } catch (erro) {
-    console.log(erro);
-    return res.status(500).send("erro");
-  }
-}
 
 export async function getposts2(req, res) {
   const { offset } = req.params;
@@ -193,6 +183,19 @@ export async function getposts2(req, res) {
     }
 
     res.send(joinPostsLikes);
+  } catch (erro) {
+    console.log(erro);
+    return res.status(500).send("erro");
+  }
+}
+
+export async function getAllPosts(req, res) {
+  try {
+    const { rows: posts } = await connection.query(
+      `select users.id, posts.id AS "postId", posts."userId", users.name, users.image AS profile, posts.comment , posts.url, posts.title, posts.image, posts.description, count(likes."postId") as "likesCount" from posts inner join users on posts."userId" = users.id left join likes on posts.id = likes."postId" group by posts.id, users.id order by posts.id desc `
+    );
+
+    res.send(posts);
   } catch (erro) {
     console.log(erro);
     return res.status(500).send("erro");
