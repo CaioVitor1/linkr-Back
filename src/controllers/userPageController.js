@@ -40,7 +40,7 @@ export async function searchUserByName(req, res){
         const search = req.query.search;
         const verifiedUser = res.locals.user
         const userId = verifiedUser.id
-        console.log(userId)
+        
         // preciso saber qual usuário está logado através do token
         const {rows: listUsersMatch} = await userPageRepository.getUsersByName(search, userId);
 
@@ -54,17 +54,29 @@ export async function searchUserByName(req, res){
          if(listUsersMatch.length === 0) {
             return res.status(200).send(listEveryUser)
          }
-        for(let i = 0; i < listEveryUser.length; i++) {
-            for(let j = 0; j < listUsersMatch.length; j++) {
-                if(listEveryUser[i].id !== listUsersMatch[j].id) {
+        if(listUsersMatch.length === 1) {
+            console.log("tá aqui no 1")
+            for(let i = 0; i < listEveryUser.length; i++) {
+                if(listUsersMatch[0].id !== listEveryUser[i].id){
                     listUsersMatch.push(listEveryUser[i])
                 }
             }
-            
+            return res.status(200).send(listUsersMatch); 
         }
-        
-        console.log(listUsersMatch[0].followersid)
-        res.status(200).send(listUsersMatch);  
+
+        if(listUsersMatch.length >= 2) {
+            console.log("tá aqui no 2")
+            for(let i = 0; i < listEveryUser.length; i++) {
+                for(let j = 0; j < listUsersMatch.length; j++) {
+                    if(listEveryUser[i].id !== listUsersMatch[j].id) {
+                        listUsersMatch.push(listEveryUser[i])
+                        
+                    }
+                }
+                
+            } return res.status(200).send(listUsersMatch); 
+        }
+        return res.status(200).send(listUsersMatch);  
         
     
      
