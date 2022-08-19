@@ -16,14 +16,22 @@ export async function userPagePosts(req, res){
     
         const {rows: postsLikes} = await likesRepository.getPostsLikes(postsId);
 
+        const { rows: commentsCount } = await connection.query(`select "postId", count(id) from comments where "postId" = ANY($1::int[]) group by "postId"`, [postsId]);
+
         let joinPostsLikes = [...posts];
 
         for(let i=0;i<joinPostsLikes.length;i++){
             joinPostsLikes[i].likes = [];
+            joinPostsLikes[i].commentsCount = 0;
             postsLikes.map(like => {
                 if(like.postId === joinPostsLikes[i].postId){
                     joinPostsLikes[i].likes.push({ id: like.id, userId: like.userId, postId: like.postId, name: like.name });
                 }
+                commentsCount.map(post => {
+                    if(post.postId === joinPostsLikes[i].postId){
+                        joinPostsLikes[i].commentsCount = post.count;
+                    }
+                  });
             });
         }
 
