@@ -6,7 +6,7 @@ import userPageRouter from "./userPageRouter.js";
 import likesRouter from "./likesRouter.js";
 import commentsRouter from "./commentsRouter.js";
 import followRouter from "./followRouter.js";
-
+import repostRouter from "./respostRouter.js";
 const router = Router();
 
 router.use(authRouter);
@@ -16,5 +16,5 @@ router.use(postRouter);
 router.use(likesRouter);
 router.use(commentsRouter);
 router.use(followRouter);
-
+router.use(repostRouter)
 export default router;
