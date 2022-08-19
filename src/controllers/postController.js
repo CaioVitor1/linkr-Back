@@ -44,36 +44,59 @@ export async function createPost(req, res) {
 }
 
 export async function getPosts(req, res) {
+  try {
+    const index = parseInt(req.query.index);
+    const verifiedUser = res.locals.user;
 
-try {
-  const verifiedUser = res.locals.user;
+    const id = verifiedUser.id;
 
-  const id = verifiedUser.id;
-    console.log(id)
-    const {rows: posts} = await connection.query(`select users.id, posts.id AS "postId", posts."userId", users.name, users.image AS profile,
-    posts.comment, posts.url, posts.title, posts.image, posts.description, count(likes."postId") as "likesCount",
-    count(comments."postId") as "commentsCount"  
+    let posts = [];
+
+    if (index > 10) {
+      posts = await connection.query(
+        `select users.id, posts.id AS "postId", posts."userId", users.name, users.image AS profile,
+    posts.comment, posts.url, posts.title, posts.image, posts.description, count(likes."postId") as "likesCount"  
         FROM posts INNER JOIN users on posts."userId" = users.id 
         left join likes on posts.id = likes."postId"
-        left join comments on posts.id = comments."postId" 
+        
       join followers ON followers."profileId" = users.id
       where followers.follower = $1
         group by posts.id, users.id
         order by posts.id
-        desc limit 10;`, [id]);
+        desc limit $2;`,
+        [id, index + 4]
+      );
+    } else {
+      posts = await connection.query(
+        `select users.id, posts.id AS "postId", posts."userId", users.name, users.image AS profile,
+    posts.comment, posts.url, posts.title, posts.image, posts.description, count(likes."postId") as "likesCount" 
+        FROM posts INNER JOIN users on posts."userId" = users.id 
+        left join likes on posts.id = likes."postId"
+        
+      join followers ON followers."profileId" = users.id
+      where followers.follower = $1
+        group by posts.id, users.id
+        order by posts.id
+        desc limit 10;`,
+        [id]
+      );
+    }
+    const postsRows = posts.rows;
 
-
-    const postsId = posts.map((post) => post.postId);
+    const postsId = postsRows.map((post) => post.postId);
 
     const { rows: postsLikes } = await connection.query(
       `select likes.*, users.name from likes inner join users ON likes."userId" = users.id where "postId" = ANY($1::int[])`,
       [postsId]
     );
-    
-    let joinPostsLikes = [...posts];
+
+    const { rows: commentsCount } = await connection.query(`select "postId", count(id) from comments where "postId" = ANY($1::int[]) group by "postId"`, [postsId]);
+
+    let joinPostsLikes = [...postsRows];
 
     for (let i = 0; i < joinPostsLikes.length; i++) {
       joinPostsLikes[i].likes = [];
+      joinPostsLikes[i].commentsCount = 0;
       postsLikes.map((like) => {
         if (like.postId === joinPostsLikes[i].postId) {
           joinPostsLikes[i].likes.push({
@@ -82,6 +105,11 @@ try {
             postId: like.postId,
             name: like.name,
           });
+        }
+      });
+      commentsCount.map(post => {
+        if(post.postId === joinPostsLikes[i].postId){
+            joinPostsLikes[i].commentsCount = post.count;
         }
       });
     }
@@ -100,7 +128,7 @@ export async function deletepost(req, res) {
   try {
     const { postId } = req.params;
     const verifiedUser = res.locals.user;
-    console.log(verifiedUser);
+    //console.log(verifiedUser);
 
     const id = verifiedUser.id;
 
