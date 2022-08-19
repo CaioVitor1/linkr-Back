@@ -11,7 +11,7 @@ export async function createFollow(req, res) {
         if(searchId.length !== 2) {
             return res.status(404).send("Um dos usuários não existe!")
         }
-        const {rows: lookingFollow} = await  followRepository.lookFollow(profileId, follower)
+        const {rows: lookingFollow} = await followRepository.lookFollow(profileId, follower)
       
         if(lookingFollow.length === 0) {
             const newFollow = await followRepository.insertFollow(profileId, follower)
@@ -34,7 +34,7 @@ export async function searchFollow(req, res) {
         const {profileId} = req.params
         console.log(profileId, follower)
         
-        const {rows: lookingFollow} = await  connection.query('SELECT * FROM followers WHERE "profileId" = $1 AND follower = $2', [profileId, follower])
+        const {rows: lookingFollow} = await  followRepository.lookFollow(profileId, follower)
         console.log(lookingFollow)
         if(lookingFollow.length !== 0) {
             return res.send(true)
@@ -56,10 +56,10 @@ export async function deleteFollow(req, res) {
         const {profileId} = req.params
         console.log(follower, profileId)
         
-        const {rows: lookingFollow} = await  connection.query('SELECT * FROM followers WHERE "profileId" = $1 AND follower = $2', [profileId, follower])
+        const {rows: lookingFollow} = await followRepository.lookFollow(profileId, follower)
        console.log(lookingFollow)
         if(lookingFollow.length !== 0) {
-            const {rows: deleteFollow} = await  connection.query('DELETE FROM followers WHERE "profileId" = $1 AND follower = $2', [profileId, follower])
+            const {rows: deleteFollow} = await followRepository.deletingFollow(profileId, follower)
             return res.status(204).send("Amizade deletada")
         } else{
             return res.status(422).send("Não existe essa amizade registrada")
@@ -76,7 +76,7 @@ export async function searchAnyFollow(req, res) {
         const verifiedUser = res.locals.user
         const follower = verifiedUser.id;
 
-        const {rows: searchfollow} = await connection.query('SELECT * FROM followers WHERE follower = $1', [follower])
+        const {rows: searchfollow} = await followRepository.searchUnicFollow(follower)
         console.log(searchFollow.length)
         console.log(searchfollow)
         return res.status(200).send(searchfollow)
