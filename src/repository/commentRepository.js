@@ -7,7 +7,7 @@ async function insertComment(comment, userId, postId){
 
 
 async function getComments(postId){
-    return connection.query(`select users.name, users.image, comments.* from comments inner join users on comments."userId" = users.id where "postId" = $1`, [postId]);
+    return connection.query(`select users.name, users.image, comments.* from comments inner join users on comments."userId" = users.id where "postId" = $1 order by id asc`, [postId]);
 }
 
 
